@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Valentine's Day Card 💖</title>
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+
+<style>
+*{box-sizing:border-box;font-family:Georgia,cursive}
+body{
+  margin:0;
+  background:linear-gradient(135deg,#ff9a9e,#fad0c4);
+  overflow-x:hidden;
+}
+#container{
+  max-width:420px;
+  margin:auto;
+  padding:15px;
+}
+#background{
+  position:fixed;
+  inset:0;
+  z-index:-2;
+}
+.heart-fall{
+  position:absolute;
+  animation:fall linear infinite;
+}
+@keyframes fall{
+  0%{transform:translateY(-10vh)}
+  100%{transform:translateY(110vh)}
+}
+
+/* CONFETTI */
+.confetti{
+  position:fixed;
+  font-size:20px;
+  animation:confettiFall 2s linear forwards;
+  pointer-events:none;
+  z-index:999;
+}
+@keyframes confettiFall{
+  0%{transform:translateY(0) rotate(0deg);opacity:1}
+  100%{transform:translateY(100vh) rotate(720deg);opacity:0}
+}
+
+#envelope{
+  background:white;
+  padding:15px;
+  border-radius:15px;
+  margin:20px 0;
+  transition:.5s;
+}
+#envelope.closed{transform:scaleY(.4)}
+textarea{
+  width:100%;
+  height:90px;
+  border-radius:10px;
+  padding:10px;
+}
+#script{
+  display:none;
+  font-family:"Brush Script MT",cursive;
+  font-size:1.4em;
+  color:#c2185b;
+}
+button,select{
+  width:100%;
+  margin:6px 0;
+  padding:10px;
+  border:none;
+  border-radius:10px;
+  background:#e91e63;
+  color:white;
+  cursor:pointer;
+}
+#map{
+  height:220px;
+  border-radius:12px;
+  margin-top:10px;
+}
+#sealDisplay{
+  text-align:center;
+  font-size:3rem;
+  margin-top:10px;
+}
+#poemDisplay{
+  display:none;
+  white-space:pre-line;
+  background:white;
+  padding:15px;
+  border-radius:15px;
+  margin-top:10px;
+  font-family:"Brush Script MT",cursive;
+  font-size:1.2em;
+  color:#c2185b;
+}
+#tapHint{
+  text-align:center;
+  color:white;
+  font-size:.9em;
+  opacity:.8;
+}
+</style>
+</head>
+
+<body>
+
+<div id="background"></div>
+
+<div id="container">
+
+<h2 style="text-align:center;color:white;">💌 Valentine Card 💌</h2>
+<p id="tapHint">Tap anywhere to start the music 🎶</p>
+
+<div id="envelope" class="closed">
+  <textarea id="message" placeholder="Type your romantic message..."></textarea>
+  <div id="script"></div>
+</div>
+
+<button onclick="toggleEnvelope()">Open / Close Envelope</button>
+<button onclick="showPoem()">Generate Secret Poem ✨</button>
+
+<div id="poemDisplay"></div>
+
+<h3 style="color:white;">Memory Map</h3>
+<div id="map"></div>
+<button onclick="addPin()">Pin a Memory Location 📍</button>
+
+<h3 style="color:white;">Wax Seal</h3>
+<select onchange="changeSeal(this.value)">
+  <option value="❤️">Heart Seal</option>
+  <option value="🔒">Lock Seal</option>
+  <option value="🌹">Rose Seal</option>
+</select>
+<div id="sealDisplay"></div>
+
+</div>
+
+<audio id="music" loop>
+  <source src="love-song.mp3" type="audio/mpeg">
+</audio>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<script>
+/* MUSIC AUTO AFTER FIRST TAP */
+const music=document.getElementById("music");
+let started=false;
+document.body.addEventListener("click",()=>{
+  if(!started){
+    music.play();
+    started=true;
+    document.getElementById("tapHint").style.display="none";
+  }
+});
+
+/* Background falling hearts */
+for(let i=0;i<20;i++){
+  let h=document.createElement("div");
+  h.innerHTML="💖";
+  h.className="heart-fall";
+  h.style.left=Math.random()*100+"vw";
+  h.style.animationDuration=(5+Math.random()*5)+"s";
+  h.style.fontSize=(15+Math.random()*20)+"px";
+  document.getElementById("background").appendChild(h);
+}
+
+/* CONFETTI HEART FUNCTION */
+function createConfetti(){
+  for(let i=0;i<40;i++){
+    let conf=document.createElement("div");
+    conf.className="confetti";
+    conf.innerHTML=["💖","💘","💝","💕"][Math.floor(Math.random()*4)];
+    conf.style.left=Math.random()*100+"vw";
+    conf.style.top="0px";
+    conf.style.fontSize=(15+Math.random()*25)+"px";
+    document.body.appendChild(conf);
+    setTimeout(()=>conf.remove(),2000);
+  }
+}
+
+/* Envelope toggle */
+function toggleEnvelope(){
+  const env=document.getElementById("envelope");
+  const msg=document.getElementById("message").value;
+  const script=document.getElementById("script");
+  const wasClosed=env.classList.contains("closed");
+
+  env.classList.toggle("closed");
+  script.innerText=msg;
+  script.style.display="block";
+
+  if(wasClosed){
+    createConfetti(); // 🎉 CONFETTI SAAT DIBUKA
+  }
+}
+
+/* Secret Poem */
+const secretPoem=
+`You are my best friend, my partner, my soulmate.
+You have given me so much love and happiness,
+and I can never thank you enough for that.
+
+You are the most beautiful person I have ever known,
+inside and out.
+You make me want to be a better person,
+to grow with you,
+to support you,
+to cherish you.
+
+You are my valentine, today and forever.
+
+I LOVEE YOUUUU WITHHH ALL MY HEARTTTT 💞💞💞💞💞
+💓💓💓💓 💕💕💕💕💕
+💖💖💖💖💖💖 ❤️‍🔥❤️‍🔥
+🫰🫰🫰 🫶🫶🫶🫶`;
+
+function showPoem(){
+  const box=document.getElementById("poemDisplay");
+  box.style.display="block";
+  box.innerText=secretPoem;
+}
+
+/* Map */
+const map=L.map('map').setView([-6.2,106.8],10);
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+function addPin(){
+  map.once('click',e=>{
+    L.marker(e.latlng).addTo(map)
+      .bindPopup("Our Memory 💖")
+      .openPopup();
+  });
+}
+
+/* Wax Seal */
+function changeSeal(v){
+  document.getElementById("sealDisplay").innerText=v;
+}
+</script>
+
+</body>
+</html>
